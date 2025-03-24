@@ -1,4 +1,3 @@
-// backend/controllers/authController.js
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
@@ -35,6 +34,7 @@ const signIn = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid credentials' });
     }
 
+    // Generate token with `usn` in the payload
     const token = generateToken({ id: user.id, usn: user.usn });
     res.status(200).json({ success: true, token, user });
   } catch (err) {
@@ -42,4 +42,4 @@ const signIn = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn }; // Export the functions
+module.exports = { signUp, signIn };

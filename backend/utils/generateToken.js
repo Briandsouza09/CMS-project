@@ -1,10 +1,13 @@
-// backend/utils/generateToken.js
 const jwt = require('jsonwebtoken');
 
-console.log('JWT Secret:', process.env.JWT_SECRET); // Debug log
+const generateToken = (user) => {
+  // Include `usn` in the payload
+  const payload = {
+    id: user.id,
+    usn: user.usn, // Ensure `usn` is included
+  };
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+  return jwt.sign(payload, process.env.JWT_SECRET, {
     expiresIn: '1h', // Token expires in 1 hour
   });
 };

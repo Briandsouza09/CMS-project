@@ -1,4 +1,3 @@
-// backend/models/InternshipRequest.js
 const db = require('../config/db');
 
 class InternshipRequest {
@@ -21,6 +20,12 @@ class InternshipRequest {
   static async findByUsn(usn) {
     const [rows] = await db.execute('SELECT * FROM internship_requests WHERE usn = ?', [usn]);
     return rows;
+  }
+
+  // Get count of internship requests for a specific USN
+  static async getCountByUsn(usn) {
+    const [rows] = await db.execute('SELECT COUNT(*) AS count FROM internship_requests WHERE usn = ?', [usn]);
+    return rows[0].count;
   }
 }
 

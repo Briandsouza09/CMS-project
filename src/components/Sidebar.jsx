@@ -1,21 +1,27 @@
 import React from 'react';
-import { Home, BookOpen, Briefcase, FolderGit2, UserCircle, Settings, LogOut } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Home, Briefcase, FolderGit2, UserCircle, LogOut } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Briefcase, label: 'Internships', path: '/internships' },
   { icon: FolderGit2, label: 'Projects', path: '/projects' },
-
   { icon: UserCircle, label: 'Profile', path: '/profile' },
-
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (typeof onLogout === 'function') {
+      onLogout(); // Call the logout function passed from App.js
+    }
+    navigate("/login"); // Redirect to login page
+  };
 
   return (
-    <div className="fixed top-0 left-0 h-screen bg-slate-800 text-white w-64 flex flex-col">
+    <div className={`fixed top-0 left-0 h-screen bg-slate-800 text-white w-64 flex flex-col ${isOpen ? '' : 'hidden'}`}>
       <div className="p-4">
         <h2 className="text-2xl font-bold">Student Portal</h2>
       </div>
@@ -46,7 +52,10 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-4 border-t border-slate-700">
-        <button className="flex items-center gap-3 text-slate-300 hover:text-white w-full px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 text-slate-300 hover:text-white w-full px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors"
+        >
           <LogOut size={20} />
           <span>Logout</span>
         </button>

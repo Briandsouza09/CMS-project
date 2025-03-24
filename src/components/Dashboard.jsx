@@ -1,55 +1,86 @@
-import React from 'react';
-import { BookOpen, Briefcase, Award, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Briefcase, Award } from 'lucide-react';
 
-const DashboardCard = ({ title, value, icon: Icon, color }: any) => {
+const DashboardCard = ({ title, icon: Icon, color, onClick, count }) => {
   return (
-    <div className={`p-4 rounded-lg shadow-md text-white ${color} flex items-center gap-4`}>
+    <div
+      className={`p-4 rounded-lg shadow-md text-white ${color} flex items-center gap-4 cursor-pointer transition-transform transform hover:scale-105`}
+      onClick={onClick}
+    >
       <Icon size={28} />
       <div>
         <h3 className="text-lg font-semibold">{title}</h3>
-        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-sm">{count !== undefined ? `${count} entries` : 'Loading...'}</p>
       </div>
     </div>
   );
 };
 
 const Dashboard = () => {
-  const recentActivities = [
-    { id: 1, title: 'Submitted Project Report', time: '2 hours ago' },
-    { id: 2, title: 'Applied for Summer Internship', time: '5 hours ago' },
-    { id: 3, title: 'Completed Python Course', time: '1 day ago' },
-    { id: 4, title: 'Updated Portfolio', time: '2 days ago' },
-  ];
+  const navigate = useNavigate();
+  const [internshipCount, setInternshipCount] = useState(null);
+  const [projectCount, setProjectCount] = useState(null);
 
-  const upcomingDeadlines = [
-    { id: 1, title: 'Database Project Submission', date: 'March 25, 2024' },
-    { id: 2, title: 'Web Development Assignment', date: 'March 28, 2024' },
-    { id: 3, title: 'Research Paper Review', date: 'April 2, 2024' },
-  ];
+  // Fetch counts from the backend
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        // Fetch internship applications count
+        const internshipResponse = await fetch('/api/internships/count', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const internshipData = await internshipResponse.json();
+        if (internshipData.success) {
+          setInternshipCount(internshipData.count);
+        }
+
+        // Fetch project requests count
+        const projectResponse = await fetch('/api/projects/count', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const projectData = await projectResponse.json();
+        if (projectData.success) {
+          setProjectCount(projectData.count);
+        }
+      } catch (err) {
+        console.error('Error fetching counts:', err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   return (
     <div className="p-4 sm:p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Welcome back, Student!</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Welcome back</h1>
         <p className="text-gray-600">Here's what's happening with your academic progress.</p>
       </div>
 
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        
-        <DashboardCard title="Internship Applications" value="" icon={Briefcase} color="bg-purple-500" />
-        <DashboardCard title="Projects" value="" icon={Award} color="bg-green-500" />
-        
-      </div>
-
-      {/* Recent Activities & Deadlines */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
-        {/* Recent Activities */}
-        
-
-        {/* Upcoming Deadlines */}
-       
+        <DashboardCard
+          title="Internship Applications"
+          icon={Briefcase}
+          color="bg-purple-500"
+          onClick={() => navigate('/internship-applications')}
+          count={internshipCount}
+        />
+        <DashboardCard
+          title="Project Requests"
+          icon={Award}
+          color="bg-green-500"
+          onClick={() => navigate('/project-requests')}
+          count={projectCount}
+        />
       </div>
     </div>
   );
