@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const guideRoutes = require('./routes/guideRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const licenseRoutes = require('./routes/licenseRoutes'); // <-- Added this line
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/student', studentRoutes);
 app.use('/api/guide', guideRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/license', licenseRoutes); // <-- Added this line
 
 // Error handler
 app.use(errorHandler);

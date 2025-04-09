@@ -42,7 +42,7 @@ const GuideDashboard = () => {
 
           {/* Reports Card */}
           <Link 
-            to="/guide/reports" 
+            to="/guide/reports/internship/123" 
             className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-indigo-300"
           >
             <div className="flex flex-col items-center text-center">

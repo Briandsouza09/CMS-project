@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { Home, LogIn, GraduationCap, BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
+import { Home, LogIn, GraduationCap, BookOpen, LogOut, LayoutDashboard, Mail, Phone } from 'lucide-react';
+import { getLicenseData } from '../api/index';
 
 const Layout = () => {
   const navigate = useNavigate();
   const profile = JSON.parse(localStorage.getItem('profile'));
+  const [license, setLicense] = useState(null);
+
+  useEffect(() => {
+    const fetchLicense = async () => {
+      try {
+        const response = await getLicenseData();
+        setLicense(response.data);
+      } catch (error) {
+        console.error('Failed to fetch license:', error);
+      }
+    };
+    fetchLicense();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('profile');
-    navigate('/');
+    localStorage.removeItem('token');
+    navigate('/login');
   };
 
   return (
@@ -19,39 +34,27 @@ const Layout = () => {
             <div className="flex items-center space-x-3">
               <GraduationCap className="h-8 w-8 text-indigo-600" />
               <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-                CMS System
+                {license?.industryName || 'CMS System'}
               </h1>
             </div>
 
             <nav className="flex items-center">
               {!profile ? (
                 <div className="flex items-center space-x-1 sm:space-x-4">
-                  <Link
-                    to="/"
-                    className="flex items-center px-3 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
-                  >
+                  <Link to="/" className="flex items-center px-3 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
                     <Home className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Home</span>
                   </Link>
-                  <Link
-                    to="/login"
-                    className="flex items-center px-3 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
-                  >
+                  <Link to="/login" className="flex items-center px-3 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
                     <LogIn className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Login</span>
                   </Link>
-                  <Link
-                    to="/register/student"
-                    className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow"
-                  >
+                  <Link to="/register/student" className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow">
                     <GraduationCap className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Register as Student</span>
                     <span className="sm:hidden">Student</span>
                   </Link>
-                  <Link
-                    to="/register/guide"
-                    className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow"
-                  >
+                  <Link to="/register/guide" className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow">
                     <BookOpen className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Register as Guide</span>
                     <span className="sm:hidden">Guide</span>
@@ -62,17 +65,11 @@ const Layout = () => {
                   <span className="text-gray-700 hidden sm:flex items-center">
                     Welcome, <strong className="ml-1 text-indigo-600">{profile.user.name}</strong>
                   </span>
-                  <Link
-                    to={profile.user.role === 'student' ? '/student' : '/guide'}
-                    className="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200"
-                  >
+                  <Link to={profile.user.role === 'student' ? '/student' : '/guide'} className="flex items-center px-4 py-2 rounded-lg text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200">
                     <LayoutDashboard className="h-4 w-4 mr-2" />
                     <span>Dashboard</span>
                   </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 shadow-sm hover:shadow"
-                  >
+                  <button onClick={handleLogout} className="flex items-center px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 shadow-sm hover:shadow">
                     <LogOut className="h-4 w-4 mr-2" />
                     <span>Logout</span>
                   </button>
@@ -94,8 +91,23 @@ const Layout = () => {
           <div className="flex flex-col items-center justify-center space-y-2">
             <div className="flex items-center space-x-2">
               <GraduationCap className="h-5 w-5 text-indigo-600" />
-              <span className="text-gray-600 font-medium">CMS Project</span>
+              <span className="text-gray-600 font-medium">
+                {license?.industryName || 'CMS Project'}
+              </span>
             </div>
+            {license && (
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center">
+                  <Mail className="h-4 w-4 mr-1" />
+                  <span>{license.email}</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="h-4 w-4 mr-1" />
+                  <span>{license.contact1}</span>
+                  {license.contact2 && <span className="ml-2">| {license.contact2}</span>}
+                </div>
+              </div>
+            )}
             <p className="text-sm text-gray-500">© {new Date().getFullYear()} All rights reserved</p>
           </div>
         </div>
